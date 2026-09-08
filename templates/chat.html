@@ -1,0 +1,230 @@
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Medical Chatbot</title>
+
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="https://use.fontawesome.com/releases/v5.5.0/css/all.css">
+
+    <link rel="stylesheet"
+          type="text/css"
+          href="{{ url_for('static', filename='style.css') }}"/>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+
+<body>
+
+<div class="container-fluid h-100">
+    <div class="row justify-content-center h-100">
+
+        <div class="col-md-8 col-xl-6 chat">
+
+            <div class="card">
+
+                <!-- Header -->
+                <div class="card-header msg_head">
+
+                    <div class="d-flex bd-highlight">
+
+                        <div class="img_cont">
+
+                            <img src="https://cdn-icons-png.flaticon.com/512/387/387569.png"
+                                 class="rounded-circle user_img">
+
+                            <span class="online_icon"></span>
+
+                        </div>
+
+                        <div class="user_info">
+                            <span>Medical Chatbot</span>
+                            <p>Ask me anything!</p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Chat messages -->
+                <div id="messageFormeight"
+                     class="card-body msg_card_body">
+                </div>
+
+
+                <!-- Input -->
+                <div class="card-footer">
+
+                    <form id="messageArea" class="input-group">
+
+                        <input type="text"
+                               id="text"
+                               name="msg"
+                               placeholder="Type your message..."
+                               autocomplete="off"
+                               class="form-control type_msg"
+                               required>
+
+                        <div class="input-group-append">
+
+                            <button type="submit"
+                                    id="send"
+                                    class="input-group-text send_btn">
+
+                                <i class="fas fa-location-arrow"></i>
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<script>
+
+$(document).ready(function() {
+
+    $("#messageArea").on("submit", function(event) {
+
+        // Prevent page reload
+        event.preventDefault();
+
+        // Get current time
+        const date = new Date();
+
+        const hour = date.getHours();
+        const minute = date.getMinutes();
+
+        const str_time = hour + ":" + minute;
+
+        // Get user message
+        var rawText = $("#text").val();
+
+        // Display user message
+        var userHtml =
+            '<div class="d-flex justify-content-end mb-4">' +
+
+                '<div class="msg_cotainer_send">' +
+
+                    rawText +
+
+                    '<span class="msg_time_send">' +
+                        str_time +
+                    '</span>' +
+
+                '</div>' +
+
+                '<div class="img_cont_msg">' +
+
+                    '<img src="https://i.ibb.co/d5b84Xw/Untitled-design.png" ' +
+                         'class="rounded-circle user_img_msg">' +
+
+                '</div>' +
+
+            '</div>';
+
+
+        // Clear input box
+        $("#text").val("");
+
+        // Add user message to chat
+        $("#messageFormeight").append(userHtml);
+
+
+        // Send message to Flask
+        $.ajax({
+
+            data: {
+                msg: rawText
+            },
+
+            type: "POST",
+
+            url: "/get"
+
+        })
+
+        // If Flask successfully responds
+        .done(function(data) {
+
+            console.log("Bot response:", data);
+
+
+            // Create bot message
+            var botHtml =
+
+                '<div class="d-flex justify-content-start mb-4">' +
+
+                    '<div class="img_cont_msg">' +
+
+                        '<img src="https://cdn-icons-png.flaticon.com/512/387/387569.png" ' +
+                             'class="rounded-circle user_img_msg">' +
+
+                    '</div>' +
+
+                    '<div class="msg_cotainer">' +
+
+                        data +
+
+                        '<span class="msg_time">' +
+                            str_time +
+                        '</span>' +
+
+                    '</div>' +
+
+                '</div>';
+
+
+            // Display bot response
+            $("#messageFormeight").append(botHtml);
+
+        })
+
+
+        // If Flask returns an error
+        .fail(function(xhr, status, error) {
+
+            console.log("ERROR:", xhr.status);
+
+            console.log("Response:", xhr.responseText);
+
+            console.log("Status:", status);
+
+            console.log("Error:", error);
+
+
+            alert(
+                "Chatbot error: " +
+                xhr.status +
+                "\n" +
+                xhr.responseText
+            );
+
+        });
+
+    });
+
+});
+
+</script>
+
+</body>
+</html>
+```
